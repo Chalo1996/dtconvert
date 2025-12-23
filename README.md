@@ -225,7 +225,3 @@ MIT. See [LICENSE](LICENSE).
 Contributions are welcome. The project currently has a single maintainer.
 
 Maintainer: Emmanuel Chalo (<emusyoka759@gmail.com>)
-
-## License
-
-Not specified yet.
