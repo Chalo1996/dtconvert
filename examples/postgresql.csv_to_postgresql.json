@@ -1,0 +1,7 @@
+{
+  "connection": "postgresql://dtconvert@localhost:5432/dtconvertdb",
+  "table": "people",
+  "schema": "public",
+  "create_table": true,
+  "truncate": false
+}

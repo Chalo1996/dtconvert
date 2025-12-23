@@ -1,0 +1,25 @@
+# Build outputs
+bin/
+obj/
+
+# Helper binaries (built from C sources)
+lib/converters/data_convert
+lib/converters/sql_convert
+lib/converters/pg_store
+lib/converters/tokenize
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python caches (legacy or local tooling)
+__pycache__/
+*.pyc
+*.pyo
+
+# Misc
+*.log
