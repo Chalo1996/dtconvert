@@ -23,3 +23,6 @@ __pycache__/
 
 # Misc
 *.log
+
+# Local artifacts
+/test_document.pdf

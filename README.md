@@ -73,6 +73,21 @@ Notes:
 - Converter modules and helper binaries are installed under `$PREFIX/lib/dtconvert/`.
 - If `$PREFIX/bin` is not on your PATH, `make install` appends an `export PATH=...` line to your shell rc files (idempotent) and asks you to restart your shell.
 
+Updating an existing install (common troubleshooting):
+
+```bash
+command -v dtconvert
+./bin/dtconvert --version
+dtconvert --version
+```
+
+If `dtconvert` (from your PATH) is older than `./bin/dtconvert` (from this repo), rebuild + reinstall. For a prior user install:
+
+```bash
+make clean && make
+make install PREFIX=$HOME/.local
+```
+
 ## Dependencies
 
 `dtconvert` builds with just a C toolchain, but some conversions rely on external tools.
@@ -83,6 +98,8 @@ Notes:
 - TXT/CSV→PDF: `enscript` + Ghostscript (`ps2pdf`)
 - XLSX/CSV: `xlsx2csv` (preferred) or `libreoffice` or `ssconvert` (Gnumeric)
 - PostgreSQL: `psql` (`postgresql-client`)
+
+Note: If LibreOffice prints `Warning: failed to launch javaldx - java may not function correctly`, install Java support for LibreOffice (Ubuntu/Debian: `sudo apt install -y default-jre libreoffice-java-common`). The warning is typically non-fatal for PDF export, but installing these packages usually removes it.
 
 Ubuntu/Debian (install only what you need):
 
@@ -124,10 +141,41 @@ Note (Arch): If you prefer the stable LibreOffice track, replace `libreoffice-fr
 
 ## Usage
 
+## Supported conversions
+
+<!-- BEGIN SUPPORTED_CONVERSIONS (autogen) -->
+
+| From | To | Implementation |
+|------|----|----------------|
+| csv | json | lib/converters/data_convert |
+| csv | pdf | modules/csv_to_pdf.sh |
+| csv | postgresql | modules/csv_to_postgresql.sh |
+| csv | sql | modules/csv_to_sql.sh |
+| csv | txt | modules/csv_to_txt.sh |
+| csv | xlsx | modules/csv_to_xlsx.sh |
+| csv | yaml | lib/converters/data_convert |
+| docx | odt | modules/docx_to_odt.sh |
+| docx | pdf | modules/docx_to_pdf.sh |
+| json | csv | lib/converters/data_convert |
+| json | yaml | lib/converters/data_convert |
+| odt | docx | modules/odt_to_docx.sh |
+| odt | pdf | modules/odt_to_pdf.sh |
+| postgresql | csv | modules/postgresql_to_csv.sh |
+| sql | csv | modules/sql_to_csv.sh |
+| txt | pdf | modules/txt_to_pdf.sh |
+| txt | tokens | modules/txt_to_tokens.sh |
+| xlsx | csv | modules/xlsx_to_csv.sh |
+| yaml | csv | lib/converters/data_convert |
+| yaml | json | lib/converters/data_convert |
+
+<!-- END SUPPORTED_CONVERSIONS (autogen) -->
+
 ### Convert files
 
 ```bash
 ./bin/dtconvert document.docx --to pdf
+./bin/dtconvert document.docx --to odt
+./bin/dtconvert document.odt --to docx
 ./bin/dtconvert notes.txt --to pdf -o notes.pdf
 ./bin/dtconvert spreadsheet.xlsx --to csv
 ./bin/dtconvert data.csv --to json
@@ -153,6 +201,36 @@ Notes:
 - PostgreSQL operations require `psql` available on your PATH.
 - Import/export uses a JSON config file passed via `-o/--output`.
 - Import/export will not prompt for a password; set up credentials via `.pgpass` or `PGPASSWORD` rather than embedding passwords in the config file.
+
+If you want to run the full conversion test suite (including PostgreSQL) without being prompted for a password, you can pass it via the environment:
+
+```bash
+PGPASSWORD=dtconvert make conversions-smoke
+```
+
+The conversion sweep automatically detects `PGPASSWORD`/`~/.pgpass`; if neither is set up (or the DB is unreachable), PostgreSQL tests will be skipped.
+
+Local PostgreSQL quick setup (example):
+
+```bash
+# Install server + client (Debian/Ubuntu)
+sudo apt update
+sudo apt install -y postgresql postgresql-client
+
+# Create user + database
+sudo -u postgres psql -c "CREATE USER dtconvert WITH PASSWORD 'dtconvert';"
+sudo -u postgres psql -c "CREATE DATABASE dtconvertdb OWNER dtconvert;"
+
+# Verify connectivity (non-interactive)
+PGPASSWORD=dtconvert psql -h localhost -U dtconvert -d dtconvertdb -c 'SELECT 1;'
+```
+
+Recommended (avoid exporting `PGPASSWORD` every time):
+
+```bash
+printf '%s\n' 'localhost:5432:dtconvertdb:dtconvert:dtconvert' >> ~/.pgpass
+chmod 600 ~/.pgpass
+```
 
 ### AI helper
 

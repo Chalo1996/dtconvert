@@ -169,6 +169,16 @@ smoke: all
 		head -n 10 "$$tmpdir/out.tokens"; \
 		echo "Smoke completed"
 
+# Thorough conversion sweep across all registered converters.
+# Skips only those that require missing external tools or services.
+conversions-smoke: all
+	@chmod +x scripts/conversions_smoke.sh
+	@./scripts/conversions_smoke.sh
+
+update-supported-conversions:
+	@chmod +x scripts/update_supported_conversions.sh
+	@./scripts/update_supported_conversions.sh
+
 # Repeatable AI smoke tests
 # - Always: ai search, ai cite (offline via file://)
 # - Optional: ai summarize (ollama) if local Ollama is reachable

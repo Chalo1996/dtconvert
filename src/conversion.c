@@ -13,7 +13,9 @@ typedef struct {
 // Built-in converter registry
 static Converter converters[] = {
     {"docx", "pdf", "modules/docx_to_pdf.sh", "DOCX to PDF converter"},
+    {"docx", "odt", "modules/docx_to_odt.sh", "DOCX to ODT converter"},
     {"odt", "pdf", "modules/odt_to_pdf.sh", "ODT to PDF converter"},
+    {"odt", "docx", "modules/odt_to_docx.sh", "ODT to DOCX converter"},
     {"txt", "pdf", "modules/txt_to_pdf.sh", "Text to PDF converter"},
     {"csv", "txt", "modules/csv_to_txt.sh", "CSV to Text converter"},
     {"csv", "pdf", "modules/csv_to_pdf.sh", "CSV to PDF converter"},

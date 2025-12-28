@@ -95,7 +95,9 @@ This is the explicit dependency map for the current `modules/*.sh` implementatio
 - TXT→PDF (`modules/txt_to_pdf.sh`): `enscript` + Ghostscript (`ps2pdf`)
 - CSV→PDF (`modules/csv_to_pdf.sh`): uses CSV→TXT + TXT→PDF
 - DOCX→PDF (`modules/docx_to_pdf.sh`): `libreoffice` (preferred) or `unoconv` or `pandoc`
+- DOCX→ODT (`modules/docx_to_odt.sh`): `libreoffice` or `unoconv`
 - ODT→PDF (`modules/odt_to_pdf.sh`): `libreoffice` or `unoconv`
+- ODT→DOCX (`modules/odt_to_docx.sh`): `libreoffice` or `unoconv`
 - CSV↔XLSX (`modules/csv_to_xlsx.sh`, `modules/xlsx_to_csv.sh`): `xlsx2csv` or `libreoffice` or `ssconvert`
 - PostgreSQL (`modules/csv_to_postgresql.sh`, `modules/postgresql_to_csv.sh`): `psql`
 - AI (`dtconvert ai ...`): `curl`; plus `xdg-open` only when opening a browser
@@ -146,6 +148,10 @@ sudo apt update
 sudo apt install -y libreoffice
 ```
 
+Note: When using LibreOffice in headless mode, you may see `Warning: failed to launch javaldx - java may not function correctly`.
+This usually does not affect DOCX/ODT → PDF conversions; it just means Java-dependent LibreOffice features may not work.
+If you want to suppress the warning, install a JRE and LibreOffice Java support (Ubuntu/Debian: `sudo apt install -y default-jre libreoffice-java-common`).
+
 Alternatives:
 
 ```bash
@@ -169,6 +175,22 @@ sudo apt update
 sudo apt install -y libreoffice
 # or
 sudo apt install -y unoconv
+```
+
+Note: If you see `Warning: failed to launch javaldx - java may not function correctly`, install `default-jre` and `libreoffice-java-common` on Ubuntu/Debian.
+
+If the warning persists, verify that `javaldx` exists on your system:
+
+```bash
+find / -name javaldx 2>/dev/null
+```
+
+If it is not found, install LibreOffice's Java runtime environment package (Debian/Ubuntu):
+
+```bash
+sudo apt install -y ure-java
+find / -name javaldx 2>/dev/null
+# commonly: /usr/lib/libreoffice/program/javaldx
 ```
 
 ### Excel / XLSX
@@ -228,6 +250,37 @@ If you want a local PostgreSQL server as well:
 
 ```bash
 sudo apt install -y postgresql
+```
+
+#### Local PostgreSQL setup (example)
+
+Create a local user/database that matches the default example config:
+
+```bash
+sudo -u postgres psql -c "CREATE USER dtconvert WITH PASSWORD 'dtconvert';"
+sudo -u postgres psql -c "CREATE DATABASE dtconvertdb OWNER dtconvert;"
+```
+
+Verify connectivity:
+
+```bash
+PGPASSWORD=dtconvert psql -X -w -h localhost -U dtconvert -d dtconvertdb -c 'SELECT current_user, current_database();'
+```
+
+#### Running the full conversion suite with PostgreSQL
+
+Because `dtconvert` uses non-interactive `psql` under the hood, it will not prompt for a password.
+To include PostgreSQL in the thorough conversion sweep:
+
+```bash
+PGPASSWORD=dtconvert make conversions-smoke
+```
+
+Recommended for repeatable local use (no env var):
+
+```bash
+printf '%s\n' 'localhost:5432:dtconvertdb:dtconvert:dtconvert' >> ~/.pgpass
+chmod 600 ~/.pgpass
 ```
 
 ### AI features (`dtconvert ai ...`)
