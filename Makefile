@@ -145,6 +145,7 @@ uninstall:
 # Clean build files
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
+	@rm -f $(DATA_CONVERT) $(TOKENIZE) $(SQL_CONVERT) $(PG_STORE)
 	@echo "Cleaned build files"
 
 # Run tests

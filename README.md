@@ -36,25 +36,42 @@ There are plenty of existing tools that cover parts of this space (document conv
 
 ## Quick start
 
-### 1) Build
+### 1) Clone
+
+```bash
+git clone https://github.com/Chalo1996/dtconvert.git
+cd dtconvert
+```
+
+### 2) Build
 
 ```bash
 make
 ```
+
+If `make` fails due to missing build tools, install the build dependencies in the Dependencies section below (e.g., `build-essential` on Ubuntu/Debian).
 
 This builds:
 
 - `bin/dtconvert` (the main CLI)
 - helper binaries under `lib/converters/` used by some modules
 
-### 2) Run
+### 3) Run
 
 ```bash
 ./bin/dtconvert --help
 ./bin/dtconvert --version
 ```
 
-### 3) Install
+Sanity check (runs a real conversion with no extra dependencies beyond the build):
+
+```bash
+printf '%s\n' 'name,age' 'Ada,37' > /tmp/dtconvert_sanity.csv
+./bin/dtconvert /tmp/dtconvert_sanity.csv --to json -o /tmp/dtconvert_sanity.json
+cat /tmp/dtconvert_sanity.json
+```
+
+### 4) Install
 
 System-wide install (requires sudo):
 
@@ -141,32 +158,34 @@ Note (Arch): If you prefer the stable LibreOffice track, replace `libreoffice-fr
 
 ## Usage
 
+Common usage examples are below. Note that some conversions require external tools (LibreOffice, Pandoc, etc.); see Dependencies for install options.
+
 ## Supported conversions
 
 <!-- BEGIN SUPPORTED_CONVERSIONS (autogen) -->
 
-| From | To | Implementation |
-|------|----|----------------|
-| csv | json | lib/converters/data_convert |
-| csv | pdf | modules/csv_to_pdf.sh |
-| csv | postgresql | modules/csv_to_postgresql.sh |
-| csv | sql | modules/csv_to_sql.sh |
-| csv | txt | modules/csv_to_txt.sh |
-| csv | xlsx | modules/csv_to_xlsx.sh |
-| csv | yaml | lib/converters/data_convert |
-| docx | odt | modules/docx_to_odt.sh |
-| docx | pdf | modules/docx_to_pdf.sh |
-| json | csv | lib/converters/data_convert |
-| json | yaml | lib/converters/data_convert |
-| odt | docx | modules/odt_to_docx.sh |
-| odt | pdf | modules/odt_to_pdf.sh |
-| postgresql | csv | modules/postgresql_to_csv.sh |
-| sql | csv | modules/sql_to_csv.sh |
-| txt | pdf | modules/txt_to_pdf.sh |
-| txt | tokens | modules/txt_to_tokens.sh |
-| xlsx | csv | modules/xlsx_to_csv.sh |
-| yaml | csv | lib/converters/data_convert |
-| yaml | json | lib/converters/data_convert |
+| From       | To         | Implementation               |
+| ---------- | ---------- | ---------------------------- |
+| csv        | json       | lib/converters/data_convert  |
+| csv        | pdf        | modules/csv_to_pdf.sh        |
+| csv        | postgresql | modules/csv_to_postgresql.sh |
+| csv        | sql        | modules/csv_to_sql.sh        |
+| csv        | txt        | modules/csv_to_txt.sh        |
+| csv        | xlsx       | modules/csv_to_xlsx.sh       |
+| csv        | yaml       | lib/converters/data_convert  |
+| docx       | odt        | modules/docx_to_odt.sh       |
+| docx       | pdf        | modules/docx_to_pdf.sh       |
+| json       | csv        | lib/converters/data_convert  |
+| json       | yaml       | lib/converters/data_convert  |
+| odt        | docx       | modules/odt_to_docx.sh       |
+| odt        | pdf        | modules/odt_to_pdf.sh        |
+| postgresql | csv        | modules/postgresql_to_csv.sh |
+| sql        | csv        | modules/sql_to_csv.sh        |
+| txt        | pdf        | modules/txt_to_pdf.sh        |
+| txt        | tokens     | modules/txt_to_tokens.sh     |
+| xlsx       | csv        | modules/xlsx_to_csv.sh       |
+| yaml       | csv        | lib/converters/data_convert  |
+| yaml       | json       | lib/converters/data_convert  |
 
 <!-- END SUPPORTED_CONVERSIONS (autogen) -->
 
