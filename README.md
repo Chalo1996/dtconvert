@@ -105,6 +105,142 @@ make clean && make
 make install PREFIX=$HOME/.local
 ```
 
+## Docker Quick Start
+
+Run dtconvert in Docker without installing any dependencies on your host system.
+
+### Option 1: Pull from Docker Hub (recommended)
+
+```bash
+docker pull chaloemmanuel/dtconvert:latest
+docker run --rm chaloemmanuel/dtconvert --version
+```
+
+### Option 2: Build locally
+
+```bash
+docker build -t dtconvert .
+```
+
+### Run basic conversions
+
+```bash
+# Using the Docker Hub image:
+docker run --rm chaloemmanuel/dtconvert --help
+docker run --rm chaloemmanuel/dtconvert --version
+
+# Or using a locally built image:
+docker run --rm dtconvert --help
+docker run --rm dtconvert --version
+
+# Convert a file (mount current directory)
+docker run --rm -v $(pwd):/data chaloemmanuel/dtconvert input.csv --to json -o output.json
+```
+
+The Docker image includes all optional dependencies (LibreOffice, enscript, Ghostscript, xlsx2csv, psql, curl), so every supported conversion works out of the box.
+
+### Volume Mounting
+
+Mount your local directory to `/data` inside the container for file access:
+
+```bash
+# Single file conversion
+docker run --rm -v $(pwd):/data dtconvert myfile.docx --to pdf
+
+# Convert file in a subdirectory
+docker run --rm -v $(pwd):/data dtconvert subdir/data.csv --to json -o subdir/data.json
+
+# Mount a specific directory
+docker run --rm -v /path/to/files:/data dtconvert input.xlsx --to csv
+```
+
+The container's working directory is `/data`, so paths are relative to your mounted directory.
+
+### Environment Variables
+
+Pass environment variables for PostgreSQL and AI features:
+
+**PostgreSQL credentials:**
+
+```bash
+docker run --rm -v $(pwd):/data \
+  -e PGPASSWORD=yourpassword \
+  dtconvert data.csv --to postgresql -o config.json
+```
+
+**AI features (OpenAI):**
+
+```bash
+docker run --rm -v $(pwd):/data \
+  -e OPENAI_API_KEY=your-api-key \
+  dtconvert ai summarize document.txt
+```
+
+**AI features (Ollama):**
+
+```bash
+docker run --rm -v $(pwd):/data \
+  --network host \
+  -e DTCONVERT_OLLAMA_HOST=http://127.0.0.1:11434 \
+  -e DTCONVERT_OLLAMA_MODEL=llama3.1 \
+  dtconvert ai summarize document.txt
+```
+
+### Docker Compose
+
+A `docker-compose.yml` is included for running dtconvert with a local PostgreSQL database:
+
+```bash
+# Start PostgreSQL service
+docker compose up -d postgres
+
+# Run conversions (PostgreSQL available at localhost)
+docker compose run --rm dtconvert data.csv --to postgresql -o config.json
+
+# Export from PostgreSQL
+docker compose run --rm dtconvert config.json --from postgresql --to csv -o export.csv
+
+# Stop services
+docker compose down
+```
+
+The compose setup uses these default PostgreSQL credentials:
+- Host: `postgres` (or `localhost` with `--network host`)
+- User: `dtconvert`
+- Password: `dtconvert`
+- Database: `dtconvertdb`
+
+### Convenience Wrapper
+
+For frequent use, create a shell alias or wrapper script:
+
+**Shell alias (add to ~/.bashrc or ~/.zshrc):**
+
+```bash
+alias dtconvert='docker run --rm -v $(pwd):/data chaloemmanuel/dtconvert'
+```
+
+Then use it like the native command:
+
+```bash
+dtconvert input.csv --to json -o output.json
+```
+
+**Wrapper script (save as ~/bin/dtconvert-docker):**
+
+```bash
+#!/bin/bash
+docker run --rm \
+  -v "$(pwd):/data" \
+  -e PGPASSWORD="${PGPASSWORD:-}" \
+  -e OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
+  -e DTCONVERT_OLLAMA_HOST="${DTCONVERT_OLLAMA_HOST:-}" \
+  -e DTCONVERT_OLLAMA_MODEL="${DTCONVERT_OLLAMA_MODEL:-}" \
+  chaloemmanuel/dtconvert "$@"
+```
+
+Make it executable: `chmod +x ~/bin/dtconvert-docker`
+
 ## Dependencies
 
 `dtconvert` builds with just a C toolchain, but some conversions rely on external tools.

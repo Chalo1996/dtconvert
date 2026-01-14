@@ -1,0 +1,23 @@
+# Ignore files and folders not needed in the Docker image
+.git
+.gitignore
+*.md
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+*.DS_Store
+__pycache__/
+node_modules/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.vscode/
+
+# Build artifacts
+bin/
+obj/
+*.o

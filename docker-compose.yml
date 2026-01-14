@@ -1,0 +1,44 @@
+# Docker Compose configuration for dtconvert
+# 
+# Usage:
+#   docker compose build                    # Build the dtconvert image
+#   docker compose run dtconvert --help     # Run dtconvert with arguments
+#   docker compose up postgres              # Start PostgreSQL for testing
+#
+# For file conversions, place files in ./data directory
+
+services:
+  # Main dtconvert service
+  dtconvert:
+    build: .
+    volumes:
+      - ./data:/data
+    environment:
+      # PostgreSQL credentials
+      - PGPASSWORD=${PGPASSWORD:-}
+      - PGHOST=${PGHOST:-postgres}
+      - PGUSER=${PGUSER:-dtconvert}
+      - PGDATABASE=${PGDATABASE:-dtconvertdb}
+      # OpenAI API configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Ollama configuration
+      - DTCONVERT_OLLAMA_HOST=${DTCONVERT_OLLAMA_HOST:-http://host.docker.internal:11434}
+      - DTCONVERT_OLLAMA_MODEL=${DTCONVERT_OLLAMA_MODEL:-llama3.1}
+    # Allow access to host network services (Ollama, external databases)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Optional PostgreSQL service for testing database features
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=dtconvert
+      - POSTGRES_PASSWORD=dtconvert
+      - POSTGRES_DB=dtconvertdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
