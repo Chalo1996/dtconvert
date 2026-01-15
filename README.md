@@ -173,7 +173,7 @@ docker run --rm -v $(pwd):/data \
 ```bash
 docker run --rm -v $(pwd):/data \
   -e OPENAI_API_KEY=your-api-key \
-  dtconvert ai summarize document.txt
+  dtconvert ai summarize document.txt --backend openai
 ```
 
 **AI features (Ollama):**
@@ -184,6 +184,16 @@ docker run --rm -v $(pwd):/data \
   -e DTCONVERT_OLLAMA_HOST=http://127.0.0.1:11434 \
   -e DTCONVERT_OLLAMA_MODEL=llama3.1 \
   dtconvert ai summarize document.txt
+```
+
+**AI search and citations (no API key needed):**
+
+```bash
+# Generate search URL
+docker run --rm chaloemmanuel/dtconvert ai search "docker containers"
+
+# Generate citations
+docker run --rm chaloemmanuel/dtconvert ai cite https://example.com --style apa
 ```
 
 ### Docker Compose
