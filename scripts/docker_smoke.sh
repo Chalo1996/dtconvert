@@ -102,8 +102,10 @@ echo
 # =============================================================================
 echo "== Basic Conversion Tests =="
 
-# Create temporary directory for test files
-tmpdir="$(mktemp -d /tmp/dtconvert_docker_smoke.XXXXXX)"
+# Create temporary directory for test files. Keep it under the project by
+# default so Docker Desktop can bind-mount it; callers can override the parent.
+tmp_parent="${DTCONVERT_DOCKER_SMOKE_PARENT:-$PWD}"
+tmpdir="$(mktemp -d "$tmp_parent/.dtconvert_docker_smoke.XXXXXX")"
 trap 'rm -rf "$tmpdir"' EXIT
 
 # Create test input file

@@ -29,7 +29,8 @@ RUN make
 FROM ubuntu:24.04 AS runtime
 
 # Install runtime dependencies (no build tools)
-RUN apt-get update && \
+RUN apt-get update -o Acquire::Retries=3 && \
+    apt-get upgrade -y -o Acquire::Retries=3 && \
     apt-get install -y --no-install-recommends \
         # LibreOffice for DOCX/ODT conversions (headless mode)
         libreoffice-writer-nogui \
